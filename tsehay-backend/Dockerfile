@@ -48,7 +48,9 @@ COPY --chown=www-data:www-data . /var/www
 RUN composer install --no-dev --optimize-autoloader
 
 # Generate app key and storage link
-RUN php artisan key:generate && php artisan storage:link
+RUN if [ ! -f .env ]; then cp .env.example .env; fi \
+    && php artisan key:generate --force \
+    && php artisan storage:link
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
