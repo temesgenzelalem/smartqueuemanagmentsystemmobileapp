@@ -27,6 +27,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
+# Configure Apache for Laravel
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/public\n\
+    <Directory /var/www/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
 # Set working directory
 WORKDIR /var/www
 
