@@ -4,22 +4,20 @@ FROM php:8.3-apache
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    unzip \
+    zip \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
     libpq-dev \
-    default-libmysqlclient-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip pdo_pgsql
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,38 +26,29 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN a2enmod rewrite
 
 # Configure Apache for Laravel
-RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
+RUN cat > /etc/apache2/sites-available/000-default.conf <<'EOF'
 <VirtualHost *:80>
     DocumentRoot /var/www/public
     <Directory /var/www/public>
         AllowOverride All
         Require all granted
     </Directory>
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 EOF
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory contents
-COPY . /var/www
-
-# Copy existing application directory permissions
+# Copy app files
 COPY --chown=www-data:www-data . /var/www
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate key
-RUN php artisan key:generate
-
-# Run database migrations (optional, can be done in shell)
-# RUN php artisan migrate --force
-
-# Create storage link
-RUN php artisan storage:link
+# Generate app key and storage link
+RUN php artisan key:generate && php artisan storage:link
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
@@ -67,5 +56,4 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 # Expose port 80
 EXPOSE 80
 
-# Start Apache
 CMD ["apache2-foreground"]
