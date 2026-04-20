@@ -111,13 +111,16 @@ export default function CustomerDashboard() {
   const playBeep = useCallback(() => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = "sine"; osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.6, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 3);
+      [0, 1.5, 3].forEach(delay => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "sine"; osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.6, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 1);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 1);
+      });
     } catch {}
   }, []);
 
@@ -127,7 +130,7 @@ export default function CustomerDashboard() {
       res.data.forEach(tx => {
         const prev = prevStatuses.current[tx.id];
         if (prev && prev !== tx.status) {
-          if (tx.status === "pending") { playBeep(); playBeep(); playBeep(); showToast(t("called_banner"), "info"); }
+          if (tx.status === "pending") { playBeep(); showToast(t("called_banner"), "info"); }
           if (tx.status === "completed") showToast(t("completed") + "!", "success");
         }
         prevStatuses.current[tx.id] = tx.status;
