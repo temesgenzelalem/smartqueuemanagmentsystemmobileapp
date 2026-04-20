@@ -15,9 +15,9 @@ class CustomerController extends Controller
             'type'           => 'required|in:deposit,withdraw,transfer',
             'window_id'      => 'required|exists:windows,id',
             'account_number' => 'required|regex:/^[0-9]+$/|max:20',
-            'account_holder' => 'required|regex:/^[a-zA-Z\s]+$/|max:100',
+            'account_holder' => 'required|string|max:100',
             'amount'         => 'required|numeric|min:1',
-            'amount_words'   => 'required|regex:/^[a-zA-Z\s]+$/|max:200',
+            'amount_words'   => 'required|string|max:200',
             'deposited_by'   => 'nullable|string',
             'date'           => 'nullable|date',
             'to_account'     => 'nullable|string',
@@ -25,8 +25,6 @@ class CustomerController extends Controller
             'signature'      => 'required|image|max:2048',
         ], [
             'account_number.regex' => 'Account number must contain only numbers.',
-            'account_holder.regex' => 'Account holder name must contain only letters and spaces.',
-            'amount_words.regex' => 'Amount in words must contain only letters and spaces.',
         ]);
 
         // Enforce withdrawal limits
