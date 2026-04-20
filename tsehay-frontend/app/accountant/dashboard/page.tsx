@@ -75,12 +75,29 @@ export default function AccountantDashboard() {
     } catch {}
   };
 
+  const playNotification = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(660, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } catch {}
+  };
+
   const selectCustomer = async (transaction) => {
     if (transaction.status !== "waiting") { setSelected(transaction); return; }
     setLoading(true);
     try {
       const res = await API.post(`/queue/select/${transaction.id}`);
       setSelected(res.data);
+      playNotification();
       showToast("Customer selected — status set to Pending", "info");
       refresh();
     } catch (err) {
