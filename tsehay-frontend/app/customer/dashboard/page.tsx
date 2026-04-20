@@ -127,7 +127,7 @@ export default function CustomerDashboard() {
       res.data.forEach(tx => {
         const prev = prevStatuses.current[tx.id];
         if (prev && prev !== tx.status) {
-          if (tx.status === "pending") { playBeep(); showToast(t("called_banner"), "info"); }
+          if (tx.status === "pending") { playBeep(); playBeep(); playBeep(); showToast(t("called_banner"), "info"); }
           if (tx.status === "completed") showToast(t("completed") + "!", "success");
         }
         prevStatuses.current[tx.id] = tx.status;
