@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd tsehay-frontend && npm install && npm run build",
-  "outputDirectory": "tsehay-frontend/.next",
-  "installCommand": "cd tsehay-frontend && npm install",
-  "framework": "nextjs"
-}
