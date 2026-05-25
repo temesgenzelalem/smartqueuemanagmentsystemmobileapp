@@ -135,4 +135,30 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Verification email sent.']);
     }
+
+    // Dev-only: manually verify a customer's email when email delivery isn't available
+    public function manualVerify(Request $request)
+    {
+        if (config('app.env') === 'production') {
+            return response()->json(['message' => 'Manual verification is disabled in production.'], 403);
+        }
+
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || $user->role !== 'customer') {
+            return response()->json(['message' => 'User not found or verification not required for this account type.'], 400);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified.'], 400);
+        }
+
+        $user->markEmailAsVerified();
+
+        return response()->json(['message' => 'Email manually verified.']);
+    }
 }

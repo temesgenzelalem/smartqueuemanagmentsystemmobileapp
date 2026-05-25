@@ -16,6 +16,8 @@ Route::post('/logout',   [AuthController::class, 'logout'])->middleware('auth:sa
 // Email verification routes (for customers only)
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 Route::post('/email/resend', [AuthController::class, 'resendVerification'])->name('verification.send');
+// Dev helper: allow manual verification when not in production
+Route::post('/email/verify-manual', [AuthController::class, 'manualVerify'])->name('verification.manual');
 
 // ── Public (authenticated any role) ──────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {

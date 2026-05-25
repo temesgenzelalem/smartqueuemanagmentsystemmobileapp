@@ -52,7 +52,31 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
      */
     public function sendEmailVerificationNotification()
     {
-        if ($this->role === 'customer') {
+        if ($this->role !== 'customer') {
+            return;
+        }
+
+        // If BREVO_API_KEY is configured, send verification via Brevo HTTP API.
+        $brevoKey = config('services.brevo.api_key') ?? env('BREVO_API_KEY');
+        if (!$brevoKey) {
+            if (app()->environment('production')) {
+                throw new \RuntimeException('Brevo API key is not configured. Set BREVO_API_KEY in the production environment.');
+            }
+            return parent::sendEmailVerificationNotification();
+        }
+
+        // Generate a verification link that opens the frontend verification page
+        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+        $url = $frontendUrl.'/customer/verify?id='.$this->getKey().'&hash='.sha1($this->getEmailForVerification());
+
+        // Send via Brevo service, but fall back to the default notification on error
+        try {
+            $mailer = new \App\Services\BrevoMailer();
+            $mailer->sendVerification($this, $url);
+            return;
+        } catch (\Throwable $e) {
+            logger()->error('Brevo mailer failed: '.$e->getMessage());
+            // Fallback to the framework's default mail notification
             return parent::sendEmailVerificationNotification();
         }
     }
