@@ -135,6 +135,11 @@ class AuthController extends Controller
             $user->sendEmailVerificationNotification();
         } catch (\Throwable $e) {
             logger()->error('Email resend failed: '.$e->getMessage());
+            // In non-production environments, don't block the user flow when
+            // mail delivery fails (e.g., missing mail driver or API key).
+            if (!app()->environment('production')) {
+                return response()->json(['message' => 'Verification email sent (development fallback; email not actually sent).']);
+            }
             return response()->json(['message' => 'Unable to resend verification email. Please try again later.'], 500);
         }
 
