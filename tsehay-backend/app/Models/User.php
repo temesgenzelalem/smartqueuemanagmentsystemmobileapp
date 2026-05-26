@@ -59,9 +59,7 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
         // If BREVO_API_KEY is configured, send verification via Brevo HTTP API.
         $brevoKey = config('services.brevo.api_key') ?? env('BREVO_API_KEY');
         if (!$brevoKey) {
-            if (app()->environment('production')) {
-                throw new \RuntimeException('Brevo API key is not configured. Set BREVO_API_KEY in the production environment.');
-            }
+            logger()->warning('Brevo API key not configured. Falling back to default mail notification.');
             return parent::sendEmailVerificationNotification();
         }
 

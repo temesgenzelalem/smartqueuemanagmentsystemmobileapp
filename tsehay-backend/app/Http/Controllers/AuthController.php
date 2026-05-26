@@ -131,7 +131,12 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email already verified.'], 400);
         }
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            logger()->error('Email resend failed: '.$e->getMessage());
+            return response()->json(['message' => 'Unable to resend verification email. Please try again later.'], 500);
+        }
 
         return response()->json(['message' => 'Verification email sent.']);
     }
