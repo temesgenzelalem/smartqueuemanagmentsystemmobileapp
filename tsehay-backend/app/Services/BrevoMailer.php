@@ -11,7 +11,7 @@ class BrevoMailer
 
     public function __construct()
     {
-        $this->apiKey = config('services.brevo.api_key') ?? env('BREVO_API_KEY');
+        $this->apiKey = (string) (config('services.brevo.api_key') ?? env('BREVO_API_KEY', ''));
     }
 
     public function sendVerification(User $user, string $url): void
@@ -22,16 +22,18 @@ class BrevoMailer
 
         $senderEmail = config('mail.from.address') ?? env('MAIL_FROM_ADDRESS');
         $senderName = config('mail.from.name') ?? env('MAIL_FROM_NAME', 'Tsehay Bank');
+        $name = htmlspecialchars($user->name ?? $user->email, ENT_QUOTES, 'UTF-8');
+        $verificationUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
 
         $payload = [
             'sender' => ['name' => $senderName, 'email' => $senderEmail],
             'to' => [[ 'email' => $user->email, 'name' => $user->name ?? $user->email ]],
             'subject' => 'Verify your email address',
-            'htmlContent' => "<p>Hello {$user->name},</p><p>Please verify your email by clicking <a href=\"{$url}\">this link</a>.</p>",
-            'textContent' => "Hello {$user->name}\nPlease verify your email by opening this link: {$url}",
+            'htmlContent' => "<p>Hello {$name},</p><p>Please verify your email by clicking <a href=\"{$verificationUrl}\">this link</a>.</p>",
+            'textContent' => "Hello ".($user->name ?? $user->email)."\nPlease verify your email by opening this link: {$url}",
         ];
 
-        $response = Http::withHeaders([
+        $response = Http::timeout((int) env('MAIL_HTTP_TIMEOUT', 10))->withHeaders([
             'accept' => 'application/json',
             'api-key' => $this->apiKey,
             'content-type' => 'application/json',
