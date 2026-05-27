@@ -1,31 +1,30 @@
 workflows:
-  android-staff-app:
-    name: Smart Queue Android (Staff)
+  android-release:
+    name: Android Release Build
     max_build_duration: 60
     instance_type: linux_x2
     environment:
       flutter: stable
       vars:
         API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
+        # Set your Android OAuth Client ID from Google Cloud Console.
+        # Create one at: https://console.cloud.google.com/apis/credentials
+        # Application type: Android
+        # Package name must match your app package name
+        GOOGLE_CLIENT_ID: ""
     scripts:
-      - name: Inject API URL into bundled config
-        script: |
-          echo "API_BASE_URL=$API_BASE_URL" > assets/config.env
-      - name: Get Flutter packages
+      - name: Generate native Flutter project files
+        script: flutter create . --platforms=android
+      - name: Install dependencies
         script: flutter pub get
-      - name: Static analysis
+      - name: Analyze
         script: flutter analyze
-      - name: Run tests
+      - name: Test
         script: flutter test
-      - name: Build debug APK
+      - name: Build APK
         script: |
-          flutter build apk --debug \
-            --dart-define=API_BASE_URL=$API_BASE_URL
+          flutter build apk --release \
+            --dart-define=API_BASE_URL=$API_BASE_URL \
+            --dart-define=GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
     artifacts:
       - build/app/outputs/flutter-apk/*.apk

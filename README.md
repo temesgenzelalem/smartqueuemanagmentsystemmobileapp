@@ -1,127 +1,87 @@
-# Smart Queue Management System — Mobile App
+# Tsehay Bank Smart Queue — Mobile App
 
-Staff-only Flutter application for **Admin** and **Accountant** roles. Connects to the existing Laravel API (`tsehay-backend`) without backend changes. Customer login is blocked in the mobile client.
+A unified Flutter mobile app for **all roles**: Admin, Accountant/Window Staff, and **Customers**.
+
+## Features
+
+### Customer
+- Sign up with email/password (real email verification required before login)
+- Sign in with Google account (no verification needed)
+- Submit deposit / withdrawal / transfer requests with photo + signature
+- View live queue status (auto-refreshes every 5 seconds)
+- Notified when called to the window
+- View completed transaction receipts
+
+### Admin / Manager
+- Live queue dashboard across all windows
+- Create / delete accountant staff
+- View and filter transaction reports (daily, weekly, monthly, yearly)
+- Configure withdrawal limits
+
+### Accountant / Window Staff
+- View own queue
+- Select and process customers
+- Complete transactions
+- Upload receipt images
 
 ## Stack
 
 - Flutter (stable)
-- Riverpod
-- Dio
-- Hive (offline cache placeholders)
-- Firebase Core / Messaging (placeholder configuration)
-- Codemagic CI/CD (Android-first)
+- Laravel API (`tsehay-backend`) — Laravel Sanctum authentication
+- Google Sign-In via `google_sign_in` package
+- Signature pad via `signature` package
 
-## Project structure
+## API configuration
 
-```
-lib/
-├── core/          # constants, routes, theme, env/hive/firebase/offline services
-├── models/
-├── providers/
-├── screens/       # auth, admin, accountant
-├── services/      # API, auth, queue, transactions, reports, windows
-├── widgets/
-└── main.dart
-```
-
-## Prerequisites
-
-- Flutter SDK (stable channel)
-- Laravel API running (see parent repo `tsehay-backend`)
-- Codemagic account (for cloud builds — no local Android build required)
-
-## Configuration
-
-1. Copy environment template:
+Set `API_BASE_URL` at build time (must include `/api`):
 
 ```bash
-cp .env.example .env
+flutter run \
+  --dart-define=API_BASE_URL=https://smartqueuemanagmentsystem-backend.onrender.com/api \
+  --dart-define=GOOGLE_CLIENT_ID=<your-android-client-id>
 ```
 
-2. Set your API base URL (must include `/api`):
+## Google Sign-In setup
 
-```
-API_BASE_URL=https://your-domain.com/api
-```
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create an **Android OAuth Client ID** (application type: Android)
+3. Use your app's package name and SHA-1 fingerprint
+4. Set `GOOGLE_CLIENT_ID` in Codemagic environment variables (or `codemagic.yaml`)
+5. Also set `GOOGLE_CLIENT_ID` in your Laravel backend's `.env` so token verification works
 
-For local Laravel:
+## Codemagic build
 
-```
-API_BASE_URL=http://10.0.2.2:8000/api
-```
+1. Connect this GitHub repository in Codemagic
+2. Enable **codemagic.yaml** as the configuration source
+3. Set environment variables:
+   - `API_BASE_URL` = `https://smartqueuemanagmentsystem-backend.onrender.com/api`
+   - `GOOGLE_CLIENT_ID` = your Android OAuth client ID
+4. Trigger workflow **android-release**
 
-(`10.0.2.2` is the Android emulator alias for host `127.0.0.1`.)
+## Backend — new endpoints added
 
-3. Optional: pass at build/run time:
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/auth/google` | Google sign-in — accepts `id_token`, returns Sanctum token |
 
-```bash
-flutter run --dart-define=API_BASE_URL=https://your-domain.com/api
-```
+All existing customer endpoints remain unchanged:
 
-Bundled defaults live in `assets/config.env` (overwritten in Codemagic).
+| Method | Path | Role |
+|--------|------|------|
+| `POST` | `/api/register` | Public |
+| `POST` | `/api/login` | Public |
+| `POST` | `/api/email/resend` | Public |
+| `GET` | `/api/my-transactions` | Customer |
+| `POST` | `/api/transactions` | Customer |
+| `GET` | `/api/my-receipts` | Customer |
+| `GET` | `/api/available-windows` | Any auth |
 
-## Local commands
+## Default admin credentials (seeded)
 
-```bash
-cd tsehay-mobileapp   # or repo root if this is the root project
-flutter pub get
-flutter analyze
-flutter test
-flutter run
-```
-
-## Android build (local or Codemagic)
-
-Debug APK:
-
-```bash
-flutter build apk --debug --dart-define=API_BASE_URL=https://your-domain.com/api
-```
-
-Release APK (requires signing setup):
-
-```bash
-flutter build apk --release --dart-define=API_BASE_URL=https://your-domain.com/api
-```
-
-Output: `build/app/outputs/flutter-apk/`
-
-### Codemagic
-
-1. Connect this GitHub repository in [Codemagic](https://codemagic.io).
-2. Enable **codemagic.yaml** as the configuration source.
-3. Set environment variable `API_BASE_URL` in Codemagic (or edit `codemagic.yaml`).
-4. Trigger workflow **android-staff-app**.
-
-Docs:
-
-- [Flutter projects on Codemagic](https://docs.codemagic.io/flutter-configuration/flutter-projects/)
-- [codemagic.yaml reference](https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/)
-
-## API compatibility (Laravel)
-
-| Role        | Endpoints used |
-|------------|----------------|
-| Auth       | `POST /login`, `POST /logout` |
-| Admin      | `/admin/*`, `/accountants`, `/windows`, `/transactions/{period}` |
-| Accountant | `/queue`, `/queue/select/{id}`, `/queue/complete/{id}` |
-
-Customer routes are **not** exposed in this app; customer role logins are rejected.
-
-## Firebase (placeholders)
-
-Replace values in `.env` / Codemagic vars when enabling push notifications. Until then, `FirebaseService` initializes with placeholder options and continues if Firebase is unavailable.
-
-## Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial Smart Queue staff mobile app"
-git branch -M main
-git remote add origin https://github.com/temesgenzelalem/smartqueuemanagmentsystemmobileapp.git
-git push -u origin main
-```
+| Field | Value |
+|-------|-------|
+| Email | `admin@tsehay.com` |
+| Password | `12345678` |
 
 ## License
 
