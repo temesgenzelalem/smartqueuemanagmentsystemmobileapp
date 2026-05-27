@@ -6,7 +6,7 @@ workflows:
     environment:
       flutter: stable
       vars:
-        API_BASE_URL: "https://your-backend-domain.com/api"
+        API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
     triggering:
       events:
         - push
