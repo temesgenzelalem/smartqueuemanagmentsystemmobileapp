@@ -1,4 +1,4 @@
-"use client";
+X"use client";
 import { useLang } from "@/lib/lang";
 
 export function Footer({ colors }) {
@@ -7,7 +7,7 @@ export function Footer({ colors }) {
   return (
     <footer className="border-t transition-colors duration-300" style={{ borderColor: colors.border, backgroundColor: colors.bgSecondary }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <img src="https://play-lh.googleusercontent.com/UwdS4yhwiOTa5Uq_L2JdZb82iQoQbaKR-gJWUAp4Ri4SyXz_CdP0ei3BCdRF60h0SQ=w240-h480-rw" alt="Tsehay Bank" className="h-10 w-10 rounded-lg" />
