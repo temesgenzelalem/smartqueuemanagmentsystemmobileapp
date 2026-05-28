@@ -9,8 +9,6 @@ workflows:
       flutter: stable
       vars:
         API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
-      secure:
-        GOOGLE_CLIENT_ID: $CODEMAGIC_SECURE_GOOGLE_CLIENT_ID
     scripts:
       - name: Generate native Flutter project files
         script: flutter create . --platforms=android
