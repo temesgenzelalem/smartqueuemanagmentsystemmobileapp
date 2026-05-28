@@ -4,10 +4,11 @@
 .packages
 build/
 coverage/
-android/
 ios/
 linux/
 macos/
 web/
 windows/
+.idea/
+.metadata
 *.iml

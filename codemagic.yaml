@@ -1,0 +1,28 @@
+workflows:
+  android-release:
+    name: Android Release Build
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      flutter: stable
+      vars:
+        API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
+        GOOGLE_CLIENT_ID: ""
+    scripts:
+      - name: Change to app directory
+        script: cd smartqueue_staff_app
+      - name: Generate native Flutter project files
+        script: flutter create . --platforms=android
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Analyze
+        script: flutter analyze
+      - name: Test
+        script: flutter test
+      - name: Build APK
+        script: |
+          flutter build apk --release \
+            --dart-define=API_BASE_URL=$API_BASE_URL \
+            --dart-define=GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+    artifacts:
+      - smartqueue_staff_app/build/app/outputs/flutter-apk/*.apk
