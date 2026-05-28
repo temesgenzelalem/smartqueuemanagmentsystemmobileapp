@@ -9,11 +9,8 @@ workflows:
       flutter: stable
       vars:
         API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
-        # Set your Android OAuth Client ID from Google Cloud Console.
-        # Create one at: https://console.cloud.google.com/apis/credentials
-        # Application type: Android
-        # Package name must match your app package name
-        GOOGLE_CLIENT_ID: "YOUR_GOOGLE_CLIENT_ID"
+      secure:
+        GOOGLE_CLIENT_ID: $CODEMAGIC_SECURE_GOOGLE_CLIENT_ID
     scripts:
       - name: Generate native Flutter project files
         script: flutter create . --platforms=android
