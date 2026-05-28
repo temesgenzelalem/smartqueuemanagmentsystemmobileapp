@@ -268,7 +268,7 @@ class _AuthGateState extends State<AuthGate> {
     if (u == null) {
       return UnifiedAuthScreen(api: client, onLogin: _onLogin);
     }
-    final role = u['role'] as String? ?? '';
+    final role = (u['role'] as String? ?? '').toLowerCase();
     if (role == 'admin')
       return AdminShell(api: client, user: u, onLogout: _logout);
     if (role == 'accountant')
@@ -321,7 +321,7 @@ class _UnifiedAuthScreenState extends State<UnifiedAuthScreen> {
 
     try {
       final user = await widget.api.login(_email.text.trim(), _password.text);
-      final role = user['role'] as String? ?? '';
+      final role = (user['role'] as String? ?? '').toLowerCase();
       if (role == 'admin' || role == 'accountant' || role == 'customer') {
         widget.onLogin(user);
         return;
@@ -360,7 +360,7 @@ class _UnifiedAuthScreenState extends State<UnifiedAuthScreen> {
       final idToken = auth.idToken;
       if (idToken == null) throw const ApiException('Google sign-in failed.');
       final user = await widget.api.googleLogin(idToken);
-      if (user['role'] != 'customer') {
+      if ((user['role'] as String? ?? '').toLowerCase() != 'customer') {
         throw const ApiException(
           'Google login is only available for customers.',
         );
@@ -547,7 +547,7 @@ class _StaffLoginScreenState extends State<StaffLoginScreen> {
     });
     try {
       final user = await widget.api.login(_email.text.trim(), _password.text);
-      final role = user['role'] as String? ?? '';
+      final role = (user['role'] as String? ?? '').toLowerCase();
       if (role != 'admin' && role != 'accountant') {
         throw const ApiException('This login is for staff/managers only.');
       }
@@ -650,7 +650,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
     });
     try {
       final user = await widget.api.login(_email.text.trim(), _password.text);
-      if (user['role'] != 'customer') {
+      if ((user['role'] as String? ?? '').toLowerCase() != 'customer') {
         throw const ApiException(
           'This login is for customers only. Use the Staff Login button.',
         );
