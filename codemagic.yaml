@@ -7,6 +7,7 @@ workflows:
       flutter: stable
       vars:
         API_BASE_URL: "https://smartqueuemanagmentsystem-backend.onrender.com/api"
+        GOOGLE_CLIENT_ID: "REPLACE_ME"
     scripts:
       - name: Change to app directory
         script: cd smartqueue_staff_app
