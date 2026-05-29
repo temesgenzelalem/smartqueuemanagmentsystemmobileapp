@@ -210,6 +210,19 @@ class _AccountantDashboardScreenState
           _info('To account', tx.toAccount),
           _info('Date', tx.date),
           const SizedBox(height: 24),
+          // Show photo and signature if available
+          if (tx.photoUrl != null && tx.photoUrl!.isNotEmpty) ...[
+            Text('Photo', style: Theme.of(context).textTheme.labelSmall),
+            const SizedBox(height: 8),
+            Image.network(tx.photoUrl!, height: 200, fit: BoxFit.cover),
+            const SizedBox(height: 16),
+          ],
+          if (tx.signatureUrl != null && tx.signatureUrl!.isNotEmpty) ...[
+            Text('Signature', style: Theme.of(context).textTheme.labelSmall),
+            const SizedBox(height: 8),
+            Image.network(tx.signatureUrl!, height: 100, fit: BoxFit.contain),
+            const SizedBox(height: 16),
+          ],
           if (tx.status == 'pending' || tx.status == 'processing')
             ElevatedButton(
               onPressed: _loading ? null : _complete,
