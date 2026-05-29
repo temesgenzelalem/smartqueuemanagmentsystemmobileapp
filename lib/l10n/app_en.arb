@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "loginTitle": "Accountant Portal",
+  "loginSubtitle": "Admin & Accountant portal only",
+  "settingsTitle": "Settings",
+  "languageLabel": "Language",
+  "themeLabel": "Theme",
+  "english": "English",
+  "amharic": "Amharic",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System"
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "signInButton": "Sign in",
+  "splashLoading": "Loading Smart Queue..."
+}

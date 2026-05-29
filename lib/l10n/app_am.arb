@@ -1,0 +1,17 @@
+{
+  "@@locale": "am",
+  "loginTitle": "Accountant Portal",
+  "loginSubtitle": "Admin & Accountant portal only",
+  "settingsTitle": "ቅንብር",
+  "languageLabel": "ቋንቋ",
+  "themeLabel": "ገጽታ",
+  "english": "እንግሊዝኛ",
+  "amharic": "አማርኛ",
+  "light": "ብርሃን",
+  "dark": "ጨለማ",
+  "system": "ስርዓት"
+  "emailLabel": "ኢሜይል",
+  "passwordLabel": "ፓስውርድ",
+  "signInButton": "ግባ",
+  "splashLoading": "ስማርት ኪው በመጫን ላይ..."
+}

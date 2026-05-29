@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/routes/app_routes.dart';
 import '../../providers/auth_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../widgets/language_selector.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -67,9 +69,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Icon(Icons.account_balance, size: 48),
+                        Align(alignment: Alignment.topRight, child: LanguageSelector()),
                         const SizedBox(height: 12),
                         Text(
-                          'Smart Queue Staff',
+                          AppLocalizations.of(context)!.loginTitle,
                           style: Theme.of(context).textTheme.headlineSmall,
                           textAlign: TextAlign.center,
                         ),
@@ -92,7 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
-                            labelText: 'Email',
+                            labelText: AppLocalizations.of(context)!.emailLabel,
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) =>
@@ -103,7 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _passwordController,
                           obscureText: true,
                           decoration: const InputDecoration(
-                            labelText: 'Password',
+                            labelText: AppLocalizations.of(context)!.passwordLabel,
                             prefixIcon: Icon(Icons.lock_outline),
                           ),
                           validator: (v) => v == null || v.length < 6
@@ -122,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Sign in'),
+                              : Text(AppLocalizations.of(context)!.signInButton),
                         ),
                       ],
                     ),
