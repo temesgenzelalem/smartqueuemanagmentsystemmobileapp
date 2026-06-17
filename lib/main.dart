@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/locale_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,8 +32,8 @@ class SmartQueueMobileApp extends ConsumerWidget {
         darkTheme: AppTheme.dark(),
         themeMode: ref.watch(themeNotifierProvider),
       locale: ref.watch(localeNotifierProvider),
-      supportedLocales: [Locale('en'), Locale('am')],
-      localizationsDelegates: [
+      supportedLocales: const [Locale('en'), Locale('am')],
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

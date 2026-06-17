@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
 import '../models/transaction_model.dart';
 import 'api_client.dart';
 
@@ -24,5 +28,29 @@ class TransactionService {
       transactions: [],
       totals: TransactionTotals(),
     );
+  }
+
+  Future<List<dynamic>> fetchMyTransactions() async {
+    final response = await _api.get('/my-transactions');
+    return response.data as List;
+  }
+
+  Future<List<dynamic>> fetchMyReceipts() async {
+    final response = await _api.get('/my-receipts');
+    return response.data as List;
+  }
+
+  Future<void> createTransaction({
+    required Map<String, String> fields,
+    required File photo,
+    required File signature,
+  }) async {
+    final formData = FormData.fromMap({
+      ...fields,
+      'photo': await MultipartFile.fromFile(photo.path, filename: 'photo.jpg'),
+      'signature': await MultipartFile.fromFile(signature.path, filename: 'signature.png'),
+    });
+
+    await _api.post('/transactions', data: formData);
   }
 }

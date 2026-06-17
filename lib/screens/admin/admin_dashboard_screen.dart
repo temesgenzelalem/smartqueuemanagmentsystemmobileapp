@@ -7,6 +7,7 @@ import '../../core/routes/app_routes.dart';
 import '../../models/transaction_model.dart';
 import '../../models/window_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/brand_title.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/loading_indicator.dart';
@@ -121,9 +122,17 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: const BrandTitle(title: 'Admin'),
         actions: [
           IconButton(onPressed: _loadAll, icon: const Icon(Icons.refresh)),
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.settings),
+            icon: const Icon(Icons.settings_outlined),
+          ),
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.about),
+            icon: const Icon(Icons.info_outline),
+          ),
           IconButton(onPressed: _logout, icon: const Icon(Icons.logout)),
         ],
       ),

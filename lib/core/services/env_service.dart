@@ -28,7 +28,8 @@ class EnvService {
     if (fromEnv != null && fromEnv.isNotEmpty) {
       return _normalize(fromEnv);
     }
-    return 'http://127.0.0.1:8000/api';
+    // Fixed fallback to ensure compatibility with all build types
+    return 'https://smartqueuemanagmentsystem-backend.onrender.com/api';
   }
 
   static String? get firebaseApiKey => dotenv.maybeGet('FIREBASE_API_KEY');
@@ -39,8 +40,13 @@ class EnvService {
 
   static String _normalize(String url) {
     var value = url.trim();
+    // Remove trailing slash to avoid double slashes in combinations
+    if (value.endsWith('/')) {
+      value = value.substring(0, value.length - 1);
+    }
+    // Ensure it ends with /api but only if it doesn't already have it
     if (!value.endsWith('/api')) {
-      value = value.endsWith('/') ? '${value}api' : '$value/api';
+      value = '$value/api';
     }
     return value;
   }

@@ -14,6 +14,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryBlue,
+        brightness: Brightness.light,
         primary: primaryBlue,
         secondary: primaryGold,
         surface: Colors.white,
@@ -48,6 +49,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryBlue,
+        brightness: Brightness.dark,
         primary: primaryBlue,
         secondary: primaryGold,
         surface: Colors.black,
@@ -58,17 +60,19 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.grey,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll<Color>(primaryGold),
-          foregroundColor: MaterialStatePropertyAll<Color>(Colors.white),
-          padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 14, horizontal: 20)),
-          shape: MaterialStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryGold,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );

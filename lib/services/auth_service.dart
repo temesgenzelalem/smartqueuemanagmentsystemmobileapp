@@ -14,7 +14,12 @@ class AuthService {
     ApiClient? apiClient,
     FlutterSecureStorage? storage,
   })  : _apiClient = apiClient ?? ApiClient(),
-        _storage = storage ?? const FlutterSecureStorage();
+        _storage = storage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(
+                encryptedSharedPreferences: false,
+              ),
+            );
 
   Future<User> login(String email, String password) async {
     final response = await _apiClient.post(
@@ -36,14 +41,9 @@ class AuthService {
       throw AuthException('Missing authentication token');
     }
 
-    if (user.role == AppConstants.roleCustomer) {
-      throw AuthException(
-        'Customer accounts cannot use the staff mobile app.',
-      );
-    }
-
     if (user.role != AppConstants.roleAdmin &&
-        user.role != AppConstants.roleAccountant) {
+        user.role != AppConstants.roleAccountant &&
+        user.role != AppConstants.roleCustomer) {
       throw AuthException('Unauthorized role for this application.');
     }
 
@@ -67,14 +67,70 @@ class AuthService {
   }
 
   Future<User?> getCurrentUser() async {
-    final userJson = await _storage.read(key: AppConstants.userKey);
-    if (userJson == null) return null;
-    return User.fromJson(
-      Map<String, dynamic>.from(jsonDecode(userJson) as Map),
-    );
+    try {
+      final userJson = await _storage.read(key: AppConstants.userKey);
+      if (userJson == null) return null;
+      return User.fromJson(
+        Map<String, dynamic>.from(jsonDecode(userJson) as Map),
+      );
+    } catch (e) {
+      await _storage.deleteAll();
+      return null;
+    }
   }
 
-  Future<String?> getToken() => _storage.read(key: AppConstants.tokenKey);
+  Future<String?> getToken() async {
+    try {
+      return await _storage.read(key: AppConstants.tokenKey);
+    } catch (e) {
+      await _storage.deleteAll();
+      return null;
+    }
+  }
+
+  Future<User> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final response = await _apiClient.post(
+      '/register',
+      data: {
+        'name': name,
+        'email': email,
+        'password': password,
+        'role': 'customer',
+      },
+    );
+    final data = response.data;
+    if (data is Map && data['user'] is Map) {
+      return User.fromJson(Map<String, dynamic>.from(data['user'] as Map));
+    }
+    throw AuthException('Registration failed.');
+  }
+
+  Future<User> googleLogin(String idToken) async {
+    final response = await _apiClient.post(
+      '/auth/google',
+      data: {'id_token': idToken},
+    );
+    final data = response.data;
+    if (data is Map && data['user'] is Map) {
+      final user = User.fromJson(Map<String, dynamic>.from(data['user'] as Map));
+      final token = data['token']?.toString() ?? '';
+      await _storage.write(key: AppConstants.tokenKey, value: token);
+      await _storage.write(
+        key: AppConstants.userKey,
+        value: jsonEncode(user.toJson()),
+      );
+      return user;
+    }
+    throw AuthException('Google login failed.');
+  }
+
+  Future<void> resendVerification(String email) async {
+    await _apiClient.post('/email/resend', data: {'email': email});
+  }
 
   Future<bool> isLoggedIn() async {
     final token = await getToken();

@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/routes/app_routes.dart';
 import '../../providers/auth_provider.dart';
-import '../../widgets/loading_indicator.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -22,14 +20,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _bootstrap() async {
+    // Add a small delay for branding visibility
+    await Future.delayed(const Duration(seconds: 2));
     await ref.read(authNotifierProvider.notifier).restoreSession();
     if (!mounted) return;
     final auth = ref.read(authNotifierProvider);
     String route = AppRoutes.login;
     if (auth.isAuthenticated && auth.user != null) {
-      route = auth.user!.role == AppConstants.roleAdmin
-          ? AppRoutes.adminDashboard
-          : AppRoutes.accountantDashboard;
+      if (auth.user!.role == AppConstants.roleAdmin) {
+        route = AppRoutes.adminDashboard;
+      } else if (auth.user!.role == AppConstants.roleAccountant) {
+        route = AppRoutes.accountantDashboard;
+      } else {
+        route = AppRoutes.customerDashboard;
+      }
     }
     Navigator.of(context).pushReplacementNamed(route);
   }
@@ -37,7 +41,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LoadingIndicator(message: AppLocalizations.of(context)!.splashLoading),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/tsehay_logo.png',
+              width: 180,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.account_balance,
+                size: 80,
+                color: Color(0xFFD4AF37),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -3,8 +3,8 @@ import '../services/env_service.dart';
 class AppConstants {
   static String get baseUrl => EnvService.apiBaseUrl;
 
-  static const Duration connectTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 45);
+  static const Duration connectTimeout = Duration(seconds: 60);
+  static const Duration receiveTimeout = Duration(seconds: 60);
 
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';

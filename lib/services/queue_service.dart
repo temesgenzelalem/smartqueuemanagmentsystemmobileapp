@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
 import '../core/constants/app_constants.dart';
 import '../core/services/hive_service.dart';
 import '../models/transaction_model.dart';
@@ -63,6 +67,13 @@ class QueueService {
 
   Future<void> complete(int id) async {
     await _api.post('/queue/complete/$id');
+  }
+
+  Future<void> uploadReceipt(int transactionId, File file) async {
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(file.path, filename: 'receipt.jpg'),
+    });
+    await _api.post('/receipts/$transactionId', data: formData);
   }
 
   List<Transaction> _parseList(dynamic data) {
